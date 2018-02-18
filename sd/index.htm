@@ -1,0 +1,63 @@
+<html>
+
+<head>
+	<title> ES ArdLightCon </title>
+</head>
+<body>
+	<script type="text/javascript" >
+	var _spApiLoaded = false;
+	var _chartApiLoaded = false;
+	
+    function init_sp_api() {
+		console.log("init sp api start");
+        loadCallback = function() {
+            console.log("SP api initialization complete");
+            _spApiLoaded = true;
+            if( _chartApiLoaded === true ) {
+                init_the_page();
+            } else {
+                console.log("Google chart is still not ready - not initializing page...");
+            }      
+            init_visualization();
+        };
+
+		      
+        var url = window.location.href;
+        var apiRoot = 'endpoint-api-dot-forget-your-passwords.appspot.com/_ah/api';
+        apiRoot = 'https://' + apiRoot;
+        console.log("Initalizing SP Api, ROOT: " + apiRoot);
+        gapi.client.setApiKey('AIzaSyAKjCLMktdb3BMIyW5zG3UeZHdH5jaKwrM');
+        gapi.client.load('ep_api', 'v3', loadCallback, apiRoot);
+    }	
+	
+    function on_google_chart_init() {
+            console.log("google visualization library initialization complete");
+            _chartApiLoaded = true;
+            if( _spApiLoaded === true ) {
+                init_the_page();
+            } else {
+                console.log("SPApi is still not ready - not initializing page...");
+            }    
+    }
+	
+    function init_visualization() {
+        console.log("Initalizing google visualization library");
+        google.setOnLoadCallback(on_google_chart_init);        
+        google.load("visualization", "1", {packages:["corechart","table","geochart","map","calendar"], callback: on_google_chart_init});
+        
+    }	
+	
+	function init_the_page() {
+		window.alert("Init Done!");
+	}
+	</script>
+	<script type="text/javascript" src="https://apis.google.com/js/client:plusone.js?onload='init_sp_api();'"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	
+	<div style="padding: 10px; border: 4px solid green; border-radius: 20px; left: 15%; top: 15%; width: 70%; height: 70%; position: absolute;">
+		<iframe src="main.htm" frameBorder="0" style="border: 1px solid none; width: 100%; height: 100%;" > 
+		</iframe>
+	</div>
+</body>
+
+</html>

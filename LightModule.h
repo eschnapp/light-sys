@@ -5,7 +5,6 @@
 #include <DallasTemperature.h>
 
 enum LihtModulePinTypes {
-	PIN_OUT_TACH_CONTROL,
 	PIN_OUT_FAN_CONTROL,
 	PIN_OUT_LIGHT_CONTROL,
 	PIN_IN_CONNECTION_IND
@@ -15,6 +14,11 @@ class SensorAddress
 {
   public:
     DeviceAddress _address;
+
+    String toString();
+    bool equals(const SensorAddress& to_ );
+    bool equals(const DeviceAddress& to_ );
+    bool equals(const String& to_);
 };
 
 class LightModule 
@@ -27,9 +31,8 @@ class LightModule
 		char	_pinIds[3];
 		int		_statusCode;
     char  _unitId;
-    int   _rpm;
     float _temp;
-    uint8_t* _sensorAddress;
+    SensorAddress* _sensorAddress;
 
 	
 	public:
@@ -37,7 +40,7 @@ class LightModule
 	
 		typedef void AlertHandler(const LightModule* const handler_);
 	
-		LightModule(char unitId_, char tachPinId_, char fanCtrlPinId_, char lightCtrlPinId_, char conIndPinId_);
+		LightModule(char unitId_, char fanCtrlPinId_, char lightCtrlPinId_, char conIndPinId_);
 		LightModule( const LightModule& from_ );
 		
 		void initializeModule();
@@ -51,20 +54,15 @@ class LightModule
 		bool is_unit_on() { return _unitOn; };
     bool is_fan_on() { return _fanOn; };
 		int  get_status_code() { return _statusCode; };
-    void set_sensor_address(uint8_t* address_) { _sensorAddress = address_; }
-   
+    void set_sensor_address(SensorAddress* address_) { _sensorAddress = address_; }
+    SensorAddress* get_sensor_address() { return _sensorAddress; }
 		char get_unitId() { return _unitId; };
 		float getUnitTemp();
-		int	 getFanRpm();
 		
 		bool setModuleTempAlert(char highTemp_, char lowTemp_, const AlertHandler* handler_);
 		bool clearModuleTempAlert();
-		
-		bool setModuleRpmAlert(uint8_t rpmHigh_, uint8_t rpmLow_, const AlertHandler* handler_ );
-		bool clearModuleRpmAlert();
 
     void io();
-    int sampleRpm();
     float sampleTemp();
 };
 

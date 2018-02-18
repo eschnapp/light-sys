@@ -14,6 +14,7 @@ class Vector {
     size_t size() const { return d_size; }; // Size getter
     Data const &operator[](size_t idx) const { return d_data[idx]; }; // Const getter
     Data &operator[](size_t idx) { return d_data[idx]; }; // Changeable getter
+    Data & remove(size_t idx) { Data& dat = d_data[idx]; for( size_t i = idx; i < d_size; i++ ) { d_data[i] = d_data[++i]; }; d_size --; return dat; }
   private:
     void resize() { d_capacity = d_capacity ? d_capacity*2 : 1; Data *newdata = (Data *)malloc(d_capacity*sizeof(Data)); memcpy(newdata, d_data, d_size * sizeof(Data)); free(d_data); d_data = newdata; };// Allocates double the old space
 };

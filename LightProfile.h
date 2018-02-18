@@ -9,13 +9,9 @@
 
 typedef union profile_pack {
   struct bits {
-  unsigned int _id:6;
-  unsigned int _minute:6;
-  unsigned int _hour:4;
-  unsigned int _dow:3;
-  unsigned int _month:4;
-  unsigned int _dom:5;
-  unsigned long _units: 12;  
+  byte  _id;
+  unsigned long _millis;
+  word _units;  
   } BITS ;
   struct bytes {
     byte _b1;
@@ -23,6 +19,8 @@ typedef union profile_pack {
     byte _b3;
     byte _b4;
     byte _b5;
+    byte _b6;
+    byte _b7;
   } BYTES;
 } profile_pack_t;
 
