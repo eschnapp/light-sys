@@ -1,4 +1,4 @@
-#include <FreqCounter.h>
+// #include <FreqCounter.h>
 
 #include "LightModule.h"
 #include "error_codes.h"
