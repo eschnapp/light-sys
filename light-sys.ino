@@ -62,31 +62,31 @@ char             _globalChannelMap[MAX_CHANNELS][3] =  {{  48, 49,  22},
 
 //void printAddress(uint8_t* deviceAddress)
 //{
-//  Serial.print((const char *)F("["));
+//  Serial.print(F("["));
 //  Serial.print((int)deviceAddress, HEX);
-//  Serial.print((const char *)F("] "));
+//  Serial.print(F("] "));
 //  for (uint8_t i = 0; i < 8; i++)
 //  {
 //    // zero pad the address if necessary
-//    if (deviceAddress[i] < 16) Serial.print((const char *)F("0"));
+//    if (deviceAddress[i] < 16) Serial.print(F("0"));
 //    Serial.print(deviceAddress[i], HEX);
 //  }
 //}
 
 //void printProfiles()
 //{
-//  Serial.println((const char *)F("==================< START ACTIVE PROFILE INFORMATION >===================="));
+//  Serial.println(F("==================< START ACTIVE PROFILE INFORMATION >===================="));
 //  for( size_t idx = 0; idx < _profiles.size(); idx++ ){
-//    Serial.print((const char *)F("PROFILE_ID: "));
+//    Serial.print(F("PROFILE_ID: "));
 //    Serial.print(idx);
-//    Serial.print((const char *)F(" MILLIS: "));
+//    Serial.print(F(" MILLIS: "));
 //    Serial.print(_profiles[idx].BITS._millis);
-//    Serial.print((const char *)F(" UNITS_MASK "));
+//    Serial.print(F(" UNITS_MASK "));
 //    Serial.print(_profiles[idx].BITS._units, BIN);
-//    Serial.print((const char *)F(" LAST CHECK "));
+//    Serial.print(F(" LAST CHECK "));
 //    Serial.println( _lastProfileCheck[idx] );
 //  }
-//  Serial.println((const char *)F("==================< END ACTIVE PROFILE INFORMATION >===================="));
+//  Serial.println(F("==================< END ACTIVE PROFILE INFORMATION >===================="));
 //}
 
 void recvWithStartEndMarkers() {
@@ -147,8 +147,8 @@ bool fetchCommand(char* command_buf, int command_sz, char* value_buf, int value_
 
 void saveSensorFile( const DeviceAddress& address, String uid ) {
   if( _sdInit == true ) {
-    Serial.println((const char *)F("Writing temp sensor file to SD card..."));
-    String handle((const char *)F("/SENSORS/"));
+    Serial.println(F("Writing temp sensor file to SD card..."));
+    String handle(F("/SENSORS/"));
     handle.concat(uid);
     handle.toUpperCase();
     File f = SD.open(handle, FILE_WRITE);
@@ -158,36 +158,36 @@ void saveSensorFile( const DeviceAddress& address, String uid ) {
           f.write( (char)address[idx]);
         }
         f.close(); 
-        Serial.print((const char *)F("Sensor calibration saved to sensor file "));
+        Serial.print(F("Sensor calibration saved to sensor file "));
         Serial.println( handle );
       } else {
-        Serial.print((const char *)F("WARN: Failed to seek sensor file to start position: "));
+        Serial.print(F("WARN: Failed to seek sensor file to start position: "));
         Serial.println( handle );        
       }
     } else {
-      Serial.print((const char *)F("WARN: Failed to open sensor file for writing: "));
+      Serial.print(F("WARN: Failed to open sensor file for writing: "));
       Serial.println( handle );
     }
   } else {
-    Serial.print((const char *)F("Serial is not initialized, cannot write sensor address file "));
+    Serial.print(F("Serial is not initialized, cannot write sensor address file "));
     Serial.println(uid);  
   }
 }
 void calibrateTempSensor(int id) {
-  Serial.print((const char *)F("Aquiring temp sensor for channel id "));
+  Serial.print(F("Aquiring temp sensor for channel id "));
   Serial.println(id);
-  Serial.print((const char *)F("Please rub the sensor in your hand for 30 seconds..."));
+  Serial.print(F("Please rub the sensor in your hand for 30 seconds..."));
   delay(30000); // wait 30 seconds...
-  Serial.print((const char *)F("Requesting temp from all sensors..."));
+  Serial.print(F("Requesting temp from all sensors..."));
   sensors.requestTemperatures();
   float maxC = 0;
   int maxCidx = 0;
   for( int idx = 0; idx < _tempSensorCount; idx++ ) {
     uint8_t* add = _tempAddresses[idx]->_address;
-    Serial.print((const char *)F("Getting temp for sensor "));
+    Serial.print(F("Getting temp for sensor "));
     Serial.print(_tempAddresses[idx]->toString());
     float c = sensors.getTempC(add);
-    Serial.print((const char *)F(":  "));
+    Serial.print(F(":  "));
     Serial.println(c);
     if( c > maxC ) {
       maxC = c;
@@ -195,11 +195,11 @@ void calibrateTempSensor(int id) {
     }
   }
   
-  Serial.print((const char *)F("Detected temp sensor address "));
+  Serial.print(F("Detected temp sensor address "));
   Serial.print( _tempAddresses[maxCidx]->toString());
-  Serial.print((const char *)F(" With Temp reading: "));
+  Serial.print(F(" With Temp reading: "));
   Serial.println(maxC);
-  Serial.print((const char *)F("Attaching address to module "));
+  Serial.print(F("Attaching address to module "));
   Serial.println(id);
   
   _allChannels[id]->set_sensor_address(_tempAddresses[maxCidx]);
@@ -208,37 +208,37 @@ void calibrateTempSensor(int id) {
 
 void assignTempSensor(int moduleId_, const char* sensorAddress_ ) {
 
-  Serial.print((const char *)F("Trying to locate sensor with address "));
+  Serial.print(F("Trying to locate sensor with address "));
   Serial.println(sensorAddress_);
 
   for( int idx = 0; idx < _tempSensorCount; idx++ )
   {
     if( strncmp(sensorAddress_, _tempAddresses[idx]->_address, sizeof(sensorAddress_)) == 0 )
     {
-      Serial.print((const char *)F("Saving sensor ["));
+      Serial.print(F("Saving sensor ["));
       Serial.print(_tempAddresses[idx]->toString());
-      Serial.print((const char *)F("] to module ID "));
+      Serial.print(F("] to module ID "));
       Serial.println(moduleId_);
 
       if( moduleId_ > MAX_CHANNELS )
       {
         if( moduleId_ == 100 )
         {
-          Serial.print((const char *)F("Setting CPU temp sensor address: "));
+          Serial.print(F("Setting CPU temp sensor address: "));
           Serial.println(sensorAddress_);
           _cpuTempSensor = _tempAddresses[idx];
           saveSensorFile( _tempAddresses[idx]->_address, F("CPU") ); 
         }
         else if( moduleId_ == 200 )
         {
-          Serial.print((const char *)F("Setting PSU temp sensor address: "));
+          Serial.print(F("Setting PSU temp sensor address: "));
           Serial.println(sensorAddress_);
           _cpuTempSensor = _tempAddresses[idx];
           saveSensorFile( _tempAddresses[idx]->_address, F("PSU") );           
         }
         else
         {
-          Serial.println((const char *)F("Failed to locate the module for this module ID"));
+          Serial.println(F("Failed to locate the module for this module ID"));
         }
       }
       else 
@@ -250,21 +250,21 @@ void assignTempSensor(int moduleId_, const char* sensorAddress_ ) {
     }
   }
 
-  Serial.print((const char *)F("Failed to locate the sensor with the given address "));
+  Serial.print(F("Failed to locate the sensor with the given address "));
   Serial.println(sensorAddress_);
 }
 
 void displayTemps() {
-  Serial.println((const char *)F("[ID]---[ADDRESS]--------------[TEMP]"));
-  Serial.println((const char *)F("===================================="));
+  Serial.println(F("[ID]---[ADDRESS]--------------[TEMP]"));
+  Serial.println(F("===================================="));
   for( int idx = 0; idx < _tempSensorCount; idx++ ) {
     if( _tempAddresses[idx] != 0 ) {
       if( sensors.requestTemperaturesByAddress(_tempAddresses[idx]->_address)) {
         float tmpC = sensors.getTempC(_tempAddresses[idx]->_address);
         Serial.print(idx);
-        Serial.print((const char *)F("       "));
+        Serial.print(F("       "));
         Serial.print(_tempAddresses[idx]->toString());
-        Serial.print((const char *)F("   "));
+        Serial.print(F("   "));
         Serial.println( tmpC );
       }
     }
@@ -272,14 +272,14 @@ void displayTemps() {
 }
 
 void showHelp() {
-  Serial.println((const char *)F("Available Commands"));
-  Serial.println((const char *)F("====================================================="));
-  Serial.println((const char *)F("help      - print this help message"));
-  Serial.println((const char *)F("status    - print current status of unit objects"));
-  //Serial.println((const char *)F("temp      - temp show/calibrate"));
-  //Serial.println((const char *)F("auto      - switch between manual and auto modes"));
-  //Serial.println((const char *)F("profiles  - switch between manual and auto modes"));
-  //Serial.println((const char *)F("switch    - switch UNIT/LIGHT/FAN OFF or ON"));
+  Serial.println(F("Available Commands"));
+  Serial.println(F("====================================================="));
+  Serial.println(F("help      - print this help message"));
+  Serial.println(F("status    - print current status of unit objects"));
+  //Serial.println(F("temp      - temp show/calibrate"));
+  //Serial.println(F("auto      - switch between manual and auto modes"));
+  //Serial.println(F("profiles  - switch between manual and auto modes"));
+  //Serial.println(F("switch    - switch UNIT/LIGHT/FAN OFF or ON"));
 }
 
 void processConsoleInput() {
@@ -290,11 +290,11 @@ void processConsoleInput() {
     if( !fetchCommand( command, sizeof(command), value, sizeof(value))) {
        // nothing to read from console... move on...
     } else {
-        Serial.print((const char *)F("Received command: ["));
+        Serial.print(F("Received command: ["));
         Serial.print(command);
-        Serial.print((const char *)F("]-["));
+        Serial.print(F("]-["));
         Serial.print(value);
-        Serial.println((const char *)F("]"));
+        Serial.println(F("]"));
 
         if( strncmp(command, "help", strlen(command)) == 0 )  
         {
@@ -321,7 +321,7 @@ void processConsoleInput() {
           strtokIndx = strtok(tempBuf,",");      // get the first part - the string
           if( strtokIndx == NULL )
           {
-            Serial.println((const char *)F("tmpset must be formatted as <tmpset,[Module_ID],[SensorAddress]>"));
+            Serial.println(F("tmpset must be formatted as <tmpset,[Module_ID],[SensorAddress]>"));
           }
           else
           {
@@ -329,7 +329,7 @@ void processConsoleInput() {
             char address[10];
             strtokIndx = strtok(NULL, ",");
             strncpy(address, strtokIndx, 10); // copy it to messageFromPC
-            Serial.print((const char *)F("Setting temp sensor with address ["));
+            Serial.print(F("Setting temp sensor with address ["));
             Serial.print(address);
             Serial.print("] to module ID ");
             Serial.println(moduleId);
@@ -340,7 +340,7 @@ void processConsoleInput() {
         {
           if( strncmp(value, "all", sizeof(value) == 0 ))
           {
-            Serial.print((const char *)F("Switching ALL units ON"));
+            Serial.print(F("Switching ALL units ON"));
             for( int idx = 0; idx < MAX_CHANNELS; idx++ )
             {
               _allChannels[idx]->switchUnit(false);
@@ -349,9 +349,9 @@ void processConsoleInput() {
           else
           {
             int moduleId = atoi(value);
-            Serial.print((const char *)F("Switching Module "));
+            Serial.print(F("Switching Module "));
             Serial.print(moduleId);
-            Serial.println((const char *)F(" ON"));
+            Serial.println(F(" ON"));
             _allChannels[moduleId]->switchUnit(false);
           }
         }   
@@ -359,7 +359,7 @@ void processConsoleInput() {
         {
           if( strncmp(value, "all", sizeof(value) == 0 ))
           {
-            Serial.print((const char *)F("Switching ALL units OFF"));
+            Serial.print(F("Switching ALL units OFF"));
             for( int idx = 0; idx < MAX_CHANNELS; idx++ )
             {
               _allChannels[idx]->switchUnit(true);
@@ -368,9 +368,9 @@ void processConsoleInput() {
           else
           {
             int moduleId = atoi(value);
-            Serial.print((const char *)F("Switching Module "));
+            Serial.print(F("Switching Module "));
             Serial.print(moduleId);
-            Serial.println((const char *)F(" OFF"));
+            Serial.println(F(" OFF"));
             _allChannels[moduleId]->switchUnit(true);
           }
         }               
@@ -378,7 +378,7 @@ void processConsoleInput() {
         {
           if( strncmp(value, "all", sizeof(value) == 0 ))
           {
-            Serial.print((const char *)F("Switching ALL fans ON"));
+            Serial.print(F("Switching ALL fans ON"));
             for( int idx = 0; idx < MAX_CHANNELS; idx++ )
             {
               _allChannels[idx]->switchFan(false);
@@ -387,9 +387,9 @@ void processConsoleInput() {
           else
           {
             int moduleId = atoi(value);
-            Serial.print((const char *)F("Switching Fan "));
+            Serial.print(F("Switching Fan "));
             Serial.print(moduleId);
-            Serial.println((const char *)F(" ON"));
+            Serial.println(F(" ON"));
             _allChannels[moduleId]->switchFan(false);
           }          
         }      
@@ -397,7 +397,7 @@ void processConsoleInput() {
         {
           if( strncmp(value, "all", sizeof(value) == 0 ))
           {
-            Serial.print((const char *)F("Switching ALL fans OFF!!!"));
+            Serial.print(F("Switching ALL fans OFF!!!"));
             for( int idx = 0; idx < MAX_CHANNELS; idx++ )
             {
               _allChannels[idx]->switchFan(true);
@@ -406,15 +406,15 @@ void processConsoleInput() {
           else
           {
             int moduleId = atoi(value);
-            Serial.print((const char *)F("Switching Fan "));
+            Serial.print(F("Switching Fan "));
             Serial.print(moduleId);
-            Serial.println((const char *)F(" OFF!!"));
+            Serial.println(F(" OFF!!"));
             _allChannels[moduleId]->switchFan(true);
           }          
         }            
         else if( strncmp(command, "reset", strlen(command)) == 0 )
         {
-          Serial.print((const char *)F("Reset in 5 seconds!"));
+          Serial.print(F("Reset in 5 seconds!"));
           delay(5000);
           asm ("  jmp 0; ");   
         }        
@@ -446,7 +446,7 @@ void printDirectory(File dir, int numTabs)
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      Serial.print((const char *)F("\t\t"));
+      Serial.print(F("\t\t"));
       Serial.println(entry.size(), DEC);
     }
     entry.close();
@@ -454,61 +454,61 @@ void printDirectory(File dir, int numTabs)
 }
 
 void showStatus() {
-    Serial.println((const char *)F("==================< STATUS BEGIN >===================="));
+    Serial.println(F("==================< STATUS BEGIN >===================="));
     unsigned long tm = millis();
-    Serial.print((const char *)F("Uptime: ")); 
-    Serial.print((unsigned long) (tm / (1000L*60*60*24*7))); Serial.print((const char *)F(" weeks "));
-    Serial.print((unsigned long) ((tm / (1000L*60*60*24)) % 7)); Serial.print((const char *)F(" days "));
-    Serial.print((unsigned long) ((tm / (1000L*60*60)) % 24)); Serial.print((const char *)F(" hours "));
-    Serial.print((unsigned long) ((tm / (1000L*60)) % 60)); Serial.print((const char *)F(" minutes "));
-    Serial.print((unsigned long) (tm / 1000L) % 60) ; Serial.print((const char *)F(" seconds ")); 
-    Serial.println((const char *)F("."));
+    Serial.print(F("Uptime: ")); 
+    Serial.print((unsigned long) (tm / (1000L*60*60*24*7))); Serial.print(F(" weeks "));
+    Serial.print((unsigned long) ((tm / (1000L*60*60*24)) % 7)); Serial.print(F(" days "));
+    Serial.print((unsigned long) ((tm / (1000L*60*60)) % 24)); Serial.print(F(" hours "));
+    Serial.print((unsigned long) ((tm / (1000L*60)) % 60)); Serial.print(F(" minutes "));
+    Serial.print((unsigned long) (tm / 1000L) % 60) ; Serial.print(F(" seconds ")); 
+    Serial.println(F("."));
     if( _cpuTempSensor != NULL ) {
-      Serial.print((const char *)F("CPU Temp Sensor: "));
+      Serial.print(F("CPU Temp Sensor: "));
       Serial.println(_cpuTemp);
     }
     if( _psuTempSensor != NULL ) {
-      Serial.print((const char *)F("PSU Temp Sensor: "));
+      Serial.print(F("PSU Temp Sensor: "));
       Serial.println(_psuTemp);
     }    
     
-    Serial.println((const char *)F("ID  CONNTECTED UNIT FAN     TEMP     SENSOR ADDRESS"));
+    Serial.println(F("ID  CONNTECTED UNIT FAN     TEMP     SENSOR ADDRESS"));
     for( int idx = 0; idx < MAX_CHANNELS; idx++ ){
           Serial.print(idx);
-          Serial.print((const char *)F("     "));
+          Serial.print(F("     "));
           Serial.print( _allChannels[idx]->is_connected() );
-          Serial.print((const char *)F("         "));
+          Serial.print(F("         "));
           Serial.print( _allChannels[idx]->is_unit_on() );
-          Serial.print((const char *)F("     ")); 
+          Serial.print(F("     ")); 
           Serial.print( _allChannels[idx]->is_fan_on());
-          Serial.print((const char *)F("     ")); 
+          Serial.print(F("     ")); 
           Serial.print( _allChannels[idx]->getUnitTemp());
-          Serial.print((const char *)F("  "));
+          Serial.print(F("  "));
           Serial.print(_allChannels[idx]->get_sensor_address() ? _allChannels[idx]->get_sensor_address()->toString() : F("NONE") );
-          Serial.println((const char *)F(""));        
+          Serial.println(F(""));        
     }
-    Serial.println((const char *)F("==================< STATUS END >===================="));  
+    Serial.println(F("==================< STATUS END >===================="));  
 }
 
 void setup() {
  
-  Serial.begin(9600);
+  Serial.begin(115200);
   //Serial.setTimeout(100);
-  Serial.print((const char *)F("Light Controller V 2.0 Startup Sequence Starting...."));
-  Serial.print((const char *)F("========[ SETUP SEQUENCE START ]============"));
+  Serial.println(F("Light Controller V 2.0 Startup Sequence Starting...."));
+  Serial.println(F("========[ SETUP SEQUENCE START ]============"));
 
   // initialize the SD card library...
   if( !SD.begin(SDCARD_CS_PIN) ) {
-    Serial.println((const char *)F("Couldnt initialize the SD card library!"));
+    Serial.println(F("Couldnt initialize the SD card library!"));
   } else {
-    Serial.print((const char *)F("SD Card file index: "));
-    File root = SD.open((const char *)F("/"));
+    Serial.print(F("SD Card file index: "));
+    File root = SD.open(F("/"));
     printDirectory(root, 0);
     root.close();
-    if( !SD.exists((const char *)F("/SENSORS/"))) {
-      Serial.print((const char *)F("No sensors folder found - creating new one..."));
-      if( !SD.mkdir((const char *)F("/SENSORS/"))) {
-        Serial.print((const char *)F("Failed to create sensors folder in SD card!!"));
+    if( !SD.exists(F("/SENSORS/"))) {
+      Serial.print(F("No sensors folder found - creating new one..."));
+      if( !SD.mkdir(F("/SENSORS/"))) {
+        Serial.print(F("Failed to create sensors folder in SD card!!"));
       }
     }
     _sdInit = true;
@@ -520,17 +520,17 @@ void setup() {
   int devices = sensors.getDeviceCount();
   if( devices > 0 ) {
     _tempSensorCount = devices;
-    Serial.print((const char *)F("Detecting Temperature Sensors... count: "));
+    Serial.print(F("Detecting Temperature Sensors... count: "));
     Serial.println(devices);
     for( int idx = 0; idx < devices; idx++ ){
       //uint8_t * add = new uint8_t(8);
       SensorAddress*  add = new SensorAddress();
       if( ! sensors.getAddress(add->_address, idx) ) {
-        Serial.println((const char *)F("Failed to obtain address for device index: "));
+        Serial.println(F("Failed to obtain address for device index: "));
         Serial.println(idx);
         continue;
       }
-      Serial.print((const char *)F("Found TEMP Device: "));
+      Serial.print(F("Found TEMP Device: "));
       Serial.println(add->toString());
       _tempAddresses[idx] = add;
     }
@@ -538,51 +538,51 @@ void setup() {
 
   delay(5000);
   // crete the unit modules...
-  Serial.print((const char *)F("Configured MAX Units: "));
+  Serial.print(F("Configured MAX Units: "));
   Serial.println(MAX_CHANNELS);
   char ccnt = 0;
   for( char idx = 0; idx < MAX_CHANNELS; idx++ )
   {
-    Serial.print((const char *)F("Creating Module for Unit "));
+    Serial.print(F("Creating Module for Unit "));
     Serial.println((int)idx);
     LightModule* module = new LightModule ( idx
                                           , _globalChannelMap[idx][PIN_OUT_FAN_CONTROL]
                                           , _globalChannelMap[idx][PIN_OUT_LIGHT_CONTROL]
                                           , _globalChannelMap[idx][PIN_IN_CONNECTION_IND] );
     
-    Serial.print((const char *)F("Initializing Module ID: "));
+    Serial.print(F("Initializing Module ID: "));
     Serial.println(((int) idx));
     module->initializeModule();
     if( !module->is_initialized() ) {
-      Serial.println((const char *)F("Failed to initialize Module" ));
+      Serial.println(F("Failed to initialize Module" ));
       delete module;
       continue;
     }
 
     if( !module->is_connected() )
     {
-      Serial.print((const char *)F("Unit is NOT connected! You can still connect the Unit later... ID: "));
+      Serial.print(F("Unit is NOT connected! You can still connect the Unit later... ID: "));
       Serial.println((int)idx);
     }
     else 
     {
       ccnt++;
-      Serial.print((const char *)F("Unit is connected, ensuring its OFF..."));
+      Serial.print(F("Unit is connected, ensuring its OFF..."));
       module->switchUnit(false); // ensure unit is OFF
     }
-    Serial.print((const char *)F("Module is initalized, ID: "));
+    Serial.print(F("Module is initalized, ID: "));
     Serial.println((int)idx);
     _allChannels[idx] = module;
   }
-  Serial.print((const char *)F("Total number of initialized modules: "));
+  Serial.print(F("Total number of initialized modules: "));
   Serial.println(MAX_CHANNELS);
   
-  Serial.print((const char *)F("Total number of conected modules: "));
+  Serial.print(F("Total number of conected modules: "));
   Serial.println((int) ccnt);
 
   if( _sdInit == true ) {
-    Serial.print((const char *)F("Searching for TEMP sensor config files"));
-    File folder = SD.open((const char *)F("/SENSORS/"));
+    Serial.print(F("Searching for TEMP sensor config files"));
+    File folder = SD.open(F("/SENSORS/"));
     
     while(1) {
         File f = folder.openNextFile();
@@ -596,9 +596,9 @@ void setup() {
         }
 
         String nm = f.name();
-        Serial.print((const char *)F("Sensor address read for file " ));
+        Serial.print(F("Sensor address read for file " ));
         Serial.print(nm);
-        Serial.print((const char *)F(" is: "));
+        Serial.print(F(" is: "));
         Serial.println(a.toString());
 
         int fidx = -1;
@@ -608,13 +608,13 @@ void setup() {
           }
         }
         if( fidx >= 0 ) {
-          Serial.print((const char *)F("Located sensor instance... saving calibration to unit "));
+          Serial.print(F("Located sensor instance... saving calibration to unit "));
           Serial.println(nm);
           
           nm.toUpperCase();
-          if( nm.equals((const char *)F("CPU"))) {
+          if( nm.equals(F("CPU"))) {
             _cpuTempSensor = _tempAddresses[fidx];
-          } else if( nm.equals((const char *)F("PSU"))) {
+          } else if( nm.equals(F("PSU"))) {
             _psuTempSensor = _tempAddresses[fidx];
           } else {
             _allChannels[nm.toInt()]->set_sensor_address(_tempAddresses[fidx]);
@@ -623,16 +623,16 @@ void setup() {
     }
   }
   
-  Serial.print((const char *)F("Light Controller Startup Sequence Complete!"));
-  Serial.print((const char *)F("========[ SETUP SEQUENCE END ]============"));  
+  Serial.println(F("Light Controller Startup Sequence Complete!"));
+  Serial.println(F("========[ SETUP SEQUENCE END ]============"));  
 }
 
-int _loopCounter = 0;
+unsigned long _loopCounter = 0;
 void loop() {
 
   if( !_sdInit )
   {
-    Serial.print((const char *)F("SD Is not initialized... not executing the loop and waiting 1 seconds..."));
+    Serial.print(F("SD Is not initialized... not executing the loop and waiting 1 seconds..."));
     delay(1000);
     return;
   }
@@ -663,8 +663,8 @@ void loop() {
   // check for console commands...
   processConsoleInput();
 
-  if( _loopCounter++ >= 20 ) {
+  if( currentT - _loopCounter >= 10000 ) {
     showStatus();
-    _loopCounter = 0;
+    _loopCounter = currentT;
   }
 }
